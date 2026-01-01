@@ -6,6 +6,7 @@ import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
 import { MemberStatus } from '../../libs/enums/member.enum';
 import { Message } from '../../libs/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
+import { createToken } from 'graphql/language/lexer';
 
 @Injectable()
 export class MemberService {
@@ -16,7 +17,7 @@ export class MemberService {
         input.memberPassword = await this.authService.hashPassword(input.memberPassword);
         try {
             const result = await this.memberModel.create(input);
-            //TODO: Authentication via TOKEN
+            result.accessToken = await this.authService.createToken(result);
             return result;
         } catch (err) {
             console.log("Error, service.model:", err.message);
@@ -37,10 +38,9 @@ export class MemberService {
             throw new InternalServerErrorException(Message.BLOCKED_USER);
         }
 
-        //TODO: Compate passwords
         const isMatch = await this.authService.comparePassword(input.memberPassword, response.memberPassword);
         if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD);
-
+        response.accessToken = await this.authService.createToken(response);
         return response;
     }
 
