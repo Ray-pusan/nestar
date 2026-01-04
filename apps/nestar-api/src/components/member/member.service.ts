@@ -8,6 +8,7 @@ import { Message } from '../../libs/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { createToken } from 'graphql/language/lexer';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
+import { T } from '../../libs/types/common';
 
 @Injectable()
 export class MemberService {
@@ -55,13 +56,21 @@ export class MemberService {
                 input,
                 { new: true }).exec();
         if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
-        
+
         result.accessToken = await this.authService.createToken(result);
         return result;
     }
 
-    public async getMember(): Promise<string> {
-        return "getMember executed";
+    public async getMember(targetId: string): Promise<Member> {
+        const search: T = {
+            _id: targetId,
+            memberStatus: {
+                $in: [MemberStatus.ACTIVE, MemberStatus.BLOCK],
+            },
+        };
+        const targetMember = await this.memberModel.findOne(search).exec();
+        if(!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+        return targetMember;
     }
 
 
