@@ -61,52 +61,52 @@ const MemberSchema = new Schema({
     },
 
     memberArticles: {
-        type: String,
+        type: Number,
         default: 0,
     },
 
     memberFollowers: {
-        type: String,
+        type: Number,
         default: 0,
     },
 
     memberFollowings: {
-        type: String,
+        type: Number,
         default: 0,
     },
 
     memberPoints: {
-        type: String,
+        type: Number,
         default: 0,
     },
 
     memberLikes: {
-        type: String,
+        type: Number,
         default: 0,
     },
 
     memberViews: {
-        type: String,
+        type: Number,
         default: 0,
     },
 
     memberComments: {
-        type: String,
+        type: Number,
         default: 0,
     },
 
     memberRank: {
-        type: String,
+        type: Number,
         default: 0,
     },
 
     memberWarnings: {
-        type: String,
+        type: Number,
         default: 0,
     },
 
     memberBlocks: {
-        type: String,
+        type: Number,
         default: 0,
     },
 
