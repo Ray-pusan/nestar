@@ -128,7 +128,7 @@ export class MemberResolver {
 
     @UseGuards(AuthGuard)
     @Mutation((returns) => [String])
-    public async imagesUploader(
+    public async imagesUploader( 
         @Args('files', { type: () => [GraphQLUpload] })
         files: Promise<FileUpload>[],
         @Args('target') target: String,
