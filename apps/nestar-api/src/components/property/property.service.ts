@@ -101,7 +101,7 @@ export class PropertyService {
     }
 
     public async getProperties(memberId: ObjectId, input: PropertiesInquiry): Promise<Properties> {
-        const match: T = { PropertyStatus: PropertyStatus.ACTIVE };
+        const match: T = { propertyStatus: PropertyStatus.ACTIVE };
         const sort: T = { [input?.sort ?? "createdAt"]: input?.direction ?? Direction.DESC };
 
         this.shapeMatchQuery(match, input);
