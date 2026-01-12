@@ -82,7 +82,17 @@ export class PropertyResolver {
         @AuthMember("_id") memberId: ObjectId,
     ): Promise<Properties> {
         console.log("Query: getAllPropertiesByAdmin");
-        return await this.propertyService.getAllPropertiesByAdmin( input);
+        return await this.propertyService.getAllPropertiesByAdmin(input);
 
+    }
+
+    @Roles(MemberType.ADMIN)
+    @UseGuards(RolesGuard)
+    @Mutation((returns) => Property)
+    public async updatePropertyByAdmin(
+        @Args("input") input: PropertyUpdate
+    ): Promise<Property> {
+        console.log("Query: updatePropertyByAdmin");
+        return await this.propertyService.updatePropertyByAdmin(input);
     }
 }
