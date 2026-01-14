@@ -42,7 +42,7 @@ export class BoardArticleResolver {
 		return await this.boardArticleService.getBoardArticle(memberId, articleId);
 	}
 
-	@UseGuards(WithoutGuard)
+	@UseGuards(AuthGuard)
 	@Mutation((returns) => BoardArticle)
 	public async updateBoardArticle(
 		@Args('input') input: BoardArticleUpdate,
