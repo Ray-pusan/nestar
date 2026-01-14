@@ -117,8 +117,8 @@ export class PropertyService {
                             { $skip: (input.page - 1) * input.limit },
                             { $limit: input.limit },
                             //meLiked
-                            lookupMember,
-                            { $unwind: "$memberData" },
+                            lookupMember,    // [memberData] => unwind => memberdata;
+                            { $unwind: "$memberData" }, // unwind orqali biz arraydan objectga o'tkazamiz
                         ],
                         metaCounter: [{ $count: "total" }],
                     },
@@ -155,9 +155,9 @@ export class PropertyService {
 
         if (text) match.propertyTitle = { $regex: new RegExp(text, 'i') };
         if (options) {
-            match['$or'] = options.map((ele) => {
-                return { [ele]: true };
-            });
+            match['$or'] = options.map((ele) => {            //$or: [
+                return { [ele]: true };                     //  { propertyBarter: true },
+            });                                            //     { propertyRent: true } ] databasaga manashundaboradi
         }
     }
 
@@ -167,9 +167,7 @@ export class PropertyService {
 
         const match: T = {
             memberId: memberId,
-            propertyStatus: propertyStatus ?? { $ne: PropertyStatus.DELETE },
-
-
+            propertyStatus: propertyStatus ?? { $ne: PropertyStatus.DELETE }, // propertyStatusi deletega teng bo'lmaganlarini ol deyapmiz
         };
         const sort: T = { [input?.sort ?? "createdAt"]: input?.direction ?? Direction.DESC };
 
@@ -242,7 +240,7 @@ export class PropertyService {
             .exec();
         if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
-        if (soldAt || deletedAt) {
+        if (soldAt || deletedAt) { // || yoki degani
             await this.memberService.memberStatsEditor({
                 _id: result.memberId,
                 targetKey: "memberProperties",

@@ -18,7 +18,7 @@ export class PropertyResolver {
 
     @Roles(MemberType.AGENT)
     @UseGuards(RolesGuard)
-    @Mutation(() => Property)
+    @Mutation(() => Property)   // uy qo'shish uchun
     public async createProperty(@Args("input") input: PropertyInput, @AuthMember("_id") memberId: ObjectId): Promise<Property> {
         console.log("Mutation: createProperty");
         input.memberId = memberId;
@@ -27,7 +27,7 @@ export class PropertyResolver {
 
     @UseGuards(WithoutGuard)
     @Query((returns) => Property)
-    public async getProperty(
+    public async getProperty(   //Bitta uy e’lonining batafsil ma’lumotini olish.
         @Args("propertyId") input: string,
         @AuthMember("_id") memberId: ObjectId,
     ): Promise<Property> {
@@ -40,7 +40,7 @@ export class PropertyResolver {
     @Roles(MemberType.AGENT)
     @UseGuards(RolesGuard)
     @Mutation((returns) => Property)
-    public async updateProperty(
+    public async updateProperty(     // Agent o‘ziga tegishli bo‘lgan uy e’lonini tahrirlashi (yangilashi) mumkin.
         @Args("input") input: PropertyUpdate,
         @AuthMember("_id") memberId: ObjectId,
     ): Promise<Property> {
@@ -52,7 +52,7 @@ export class PropertyResolver {
 
     @UseGuards(WithoutGuard)
     @Query((returns) => Properties)
-    public async getProperties(
+    public async getProperties(   //Barcha faol uy e’lonlarini olish. Filter, qidiruv, saralash va pagination ishlaydi.
         @Args("input") input: PropertiesInquiry,
         @AuthMember("_id") memberId: ObjectId,
     ): Promise<Properties> {
@@ -64,7 +64,7 @@ export class PropertyResolver {
     @Roles(MemberType.AGENT)
     @UseGuards(RolesGuard)
     @Query((returns) => Properties)
-    public async getAgentProperties(
+    public async getAgentProperties(   //Faqat tizimga kirgan agentga o'ziga tegishli uy e’lonlarini ko'ra olish uchun.
         @Args("input") input: AgentPropertiesInquiry,
         @AuthMember("_id") memberId: ObjectId,
     ): Promise<Properties> {
@@ -77,7 +77,7 @@ export class PropertyResolver {
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Query((returns) => Properties)
-    public async getAllPropertiesByAdmin(
+    public async getAllPropertiesByAdmin(   
         @Args("input") input: AllPropertiesInquiry,
         @AuthMember("_id") memberId: ObjectId,
     ): Promise<Properties> {
@@ -89,7 +89,7 @@ export class PropertyResolver {
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Mutation((returns) => Property)
-    public async updatePropertyByAdmin(
+    public async updatePropertyByAdmin(   //Admin istalgan uy e’lonini tahrirlashi mumkin  (egasi kim bo‘lishidan qat’i nazar).
         @Args("input") input: PropertyUpdate
     ): Promise<Property> {
         console.log("Query: updatePropertyByAdmin");
@@ -99,7 +99,7 @@ export class PropertyResolver {
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Mutation((returns) => Property)
-    public async removePropertyByAdmin(
+    public async removePropertyByAdmin(   //Admin uy e’lonini tizimdan o‘chirib tashlaydi. faqat statusi delete bo'lganlarnigina
         @Args("propertyId") input: string
     ): Promise<Property> {
         console.log("Query: removePropertyByAdmin");
