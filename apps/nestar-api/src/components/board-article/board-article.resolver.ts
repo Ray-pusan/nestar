@@ -51,8 +51,10 @@ export class BoardArticleResolver {
 	public async getBoardArticles(
 		@Args('input') input: BoardArticlesInquiry,
 		@AuthMember('_id') memberId: ObjectId,
-	): Promise<BoardArticle> {
+	): Promise<BoardArticles> {
 		console.log('Query: getBoardArticles');
 		return await this.boardArticleService.getBoardArticles(memberId, input);
 	}
+
+	/** ADMIN **/
 }
