@@ -90,7 +90,7 @@ export class BoardArticleService {
 			await this.memberService.memberStatsEditor({
 				_id: memberId,
 				targetKey: 'memberArticles',
-				modifier: 1,
+				modifier: -1,
 			});
 		}
 		return result;
@@ -130,6 +130,8 @@ export class BoardArticleService {
 
 		return result[0];
 	}
+
+	/** ADMIN **/
 
 	public async getAllBoardArticlesByAdmin(input: AllBoardArticlesInquiry): Promise<BoardArticles> {
 		const { articleStatus, articleCategory } = input.search;

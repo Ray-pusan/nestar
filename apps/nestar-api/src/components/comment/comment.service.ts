@@ -82,7 +82,7 @@ export class CommentService {
 	public async getComments(memberId: ObjectId, input: CommentsInquiry): Promise<Comments> {
 		const { commentRefId } = input.search;
 		const match: T = { commentRefId: commentRefId, commentStatus: CommentStatus.ACTIVE };
-		const sort: T = { [input?.sort ?? 'createdAd']: input?.direction ?? Direction.DESC };
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
 		const result = await this.commentModel
 			.aggregate([
