@@ -1,7 +1,12 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PropertyService } from './property.service';
 import { Properties, Property } from '../../libs/dto/property/property';
-import { AgentPropertiesInquiry, AllPropertiesInquiry, PropertiesInquiry, PropertyInput } from '../../libs/dto/property/property.input';
+import {
+	AgentPropertiesInquiry,
+	AllPropertiesInquiry,
+	PropertiesInquiry,
+	PropertyInput,
+} from '../../libs/dto/property/property.input';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { UseGuards } from '@nestjs/common';
@@ -15,104 +20,111 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Resolver()
 export class PropertyResolver {
-    constructor(private readonly propertyService: PropertyService) { }
+	constructor(private readonly propertyService: PropertyService) {}
 
-    @Roles(MemberType.AGENT)
-    @UseGuards(RolesGuard)
-    @Mutation(() => Property)   // uy qo'shish uchun
-    public async createProperty(@Args("input") input: PropertyInput, @AuthMember("_id") memberId: ObjectId): Promise<Property> {
-        console.log("Mutation: createProperty");
-        input.memberId = memberId;
-        return await this.propertyService.createProperty(input);
-    }
+	@Roles(MemberType.AGENT)
+	@UseGuards(RolesGuard)
+	@Mutation(() => Property) // uy qo'shish uchun
+	public async createProperty(
+		@Args('input') input: PropertyInput,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Property> {
+		console.log('Mutation: createProperty');
+		input.memberId = memberId;
+		return await this.propertyService.createProperty(input);
+	}
 
-    @UseGuards(WithoutGuard)
-    @Query((returns) => Property)
-    public async getProperty(   //Bitta uy e’lonining batafsil ma’lumotini olish.
-        @Args("propertyId") input: string,
-        @AuthMember("_id") memberId: ObjectId,
-    ): Promise<Property> {
-        console.log("Query: getProperty");
-        const propertyId = shapeIntoMongoObjectId(input);
-        return await this.propertyService.getProperty(memberId, propertyId);
+	@UseGuards(WithoutGuard)
+	@Query((returns) => Property)
+	public async getProperty(
+		//Bitta uy e’lonining batafsil ma’lumotini olish.
+		@Args('propertyId') input: string,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Property> {
+		console.log('Query: getProperty');
+		const propertyId = shapeIntoMongoObjectId(input);
+		return await this.propertyService.getProperty(memberId, propertyId);
+	}
 
-    }
+	@Roles(MemberType.AGENT)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Property)
+	public async updateProperty(
+		// Agent o‘ziga tegishli bo‘lgan uy e’lonini tahrirlashi (yangilashi) mumkin.
+		@Args('input') input: PropertyUpdate,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Property> {
+		console.log('Mutation: updateProperty');
+		input._id = shapeIntoMongoObjectId(input._id);
+		return await this.propertyService.updateProperty(memberId, input);
+	}
 
-    @Roles(MemberType.AGENT)
-    @UseGuards(RolesGuard)
-    @Mutation((returns) => Property)
-    public async updateProperty(     // Agent o‘ziga tegishli bo‘lgan uy e’lonini tahrirlashi (yangilashi) mumkin.
-        @Args("input") input: PropertyUpdate,
-        @AuthMember("_id") memberId: ObjectId,
-    ): Promise<Property> {
-        console.log("Mutation: updateProperty");
-        input._id = shapeIntoMongoObjectId(input._id);
-        return await this.propertyService.updateProperty(memberId, input);
+	@UseGuards(WithoutGuard)
+	@Query((returns) => Properties)
+	public async getProperties(
+		//Barcha faol uy e’lonlarini olish. Filter, qidiruv, saralash va pagination ishlaydi.
+		@Args('input') input: PropertiesInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Properties> {
+		console.log('Query: getProperties');
+		return await this.propertyService.getProperties(memberId, input);
+	}
 
-    }
+	@Roles(MemberType.AGENT)
+	@UseGuards(RolesGuard)
+	@Query((returns) => Properties)
+	public async getAgentProperties(
+		//Faqat tizimga kirgan agentga o'ziga tegishli uy e’lonlarini ko'ra olish uchun.
+		@Args('input') input: AgentPropertiesInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Properties> {
+		console.log('Query: getAgentProperties');
+		return await this.propertyService.getAgentProperties(memberId, input);
+	}
 
-    @UseGuards(WithoutGuard)
-    @Query((returns) => Properties)
-    public async getProperties(   //Barcha faol uy e’lonlarini olish. Filter, qidiruv, saralash va pagination ishlaydi.
-        @Args("input") input: PropertiesInquiry,
-        @AuthMember("_id") memberId: ObjectId,
-    ): Promise<Properties> {
-        console.log("Query: getProperties");
-        return await this.propertyService.getProperties(memberId, input);
+	@UseGuards(AuthGuard)
+	@Mutation(() => Property)
+	public async likeTargetProperty(
+		@Args('propertyId') input: string,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Property> {
+		console.log('Mutation: likeTargetMember');
+		const likeRefId = shapeIntoMongoObjectId(input);
+		return await this.propertyService.likeTargetMember(memberId, likeRefId);
+	}
 
-    }
+	/** ADMIN **/
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Query((returns) => Properties)
+	public async getAllPropertiesByAdmin(
+		@Args('input') input: AllPropertiesInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Properties> {
+		console.log('Query: getAllPropertiesByAdmin');
+		return await this.propertyService.getAllPropertiesByAdmin(input);
+	}
 
-    @Roles(MemberType.AGENT)
-    @UseGuards(RolesGuard)
-    @Query((returns) => Properties)
-    public async getAgentProperties(   //Faqat tizimga kirgan agentga o'ziga tegishli uy e’lonlarini ko'ra olish uchun.
-        @Args("input") input: AgentPropertiesInquiry,
-        @AuthMember("_id") memberId: ObjectId,
-    ): Promise<Properties> {
-        console.log("Query: getAgentProperties");
-        return await this.propertyService.getAgentProperties(memberId, input);
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Property)
+	public async updatePropertyByAdmin(
+		//Admin istalgan uy e’lonini tahrirlashi mumkin  (egasi kim bo‘lishidan qat’i nazar).
+		@Args('input') input: PropertyUpdate,
+	): Promise<Property> {
+		console.log('Query: updatePropertyByAdmin');
+		return await this.propertyService.updatePropertyByAdmin(input);
+	}
 
-    }
-
-    @UseGuards(AuthGuard)
-        @Mutation(() => Property)
-        public async likeTargetProperty(@Args('propertyId') input: string, @AuthMember('_id') memberId: ObjectId): Promise<Property> {
-            console.log('Mutation: likeTargetMember');
-            const likeRefId = shapeIntoMongoObjectId(input);
-            return await this.propertyService.likeTargetMember(memberId, likeRefId);
-        }
-
-    /** ADMIN **/
-    @Roles(MemberType.ADMIN)
-    @UseGuards(RolesGuard)
-    @Query((returns) => Properties)
-    public async getAllPropertiesByAdmin(   
-        @Args("input") input: AllPropertiesInquiry,
-        @AuthMember("_id") memberId: ObjectId,
-    ): Promise<Properties> {
-        console.log("Query: getAllPropertiesByAdmin");
-        return await this.propertyService.getAllPropertiesByAdmin(input);
-
-    }
-
-    @Roles(MemberType.ADMIN)
-    @UseGuards(RolesGuard)
-    @Mutation((returns) => Property)
-    public async updatePropertyByAdmin(   //Admin istalgan uy e’lonini tahrirlashi mumkin  (egasi kim bo‘lishidan qat’i nazar).
-        @Args("input") input: PropertyUpdate
-    ): Promise<Property> {
-        console.log("Query: updatePropertyByAdmin");
-        return await this.propertyService.updatePropertyByAdmin(input);
-    }
-
-    @Roles(MemberType.ADMIN)
-    @UseGuards(RolesGuard)
-    @Mutation((returns) => Property)
-    public async removePropertyByAdmin(   //Admin uy e’lonini tizimdan o‘chirib tashlaydi. faqat statusi delete bo'lganlarnigina
-        @Args("propertyId") input: string
-    ): Promise<Property> {
-        console.log("Query: removePropertyByAdmin");
-        const propertyId = shapeIntoMongoObjectId(input);
-        return await this.propertyService.removePropertyByAdmin(propertyId);
-    }
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Property)
+	public async removePropertyByAdmin(
+		//Admin uy e’lonini tizimdan o‘chirib tashlaydi. faqat statusi delete bo'lganlarnigina
+		@Args('propertyId') input: string,
+	): Promise<Property> {
+		console.log('Query: removePropertyByAdmin');
+		const propertyId = shapeIntoMongoObjectId(input);
+		return await this.propertyService.removePropertyByAdmin(propertyId);
+	}
 }
