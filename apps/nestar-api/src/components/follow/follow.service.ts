@@ -6,16 +6,12 @@ import { MemberService } from '../member/member.service';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { FollowInquiry } from '../../libs/dto/follow/follow.input';
 import { T } from '../../libs/types/common';
-<<<<<<< HEAD
-import { lookupFollowerData, lookupFollowingData } from '../../libs/config';
-=======
 import {
 	lookupAuthMemberFollowed,
 	lookupAuthMemberLiked,
 	lookupFollowerData,
 	lookupFollowingData,
 } from '../../libs/config';
->>>>>>> 0d80e64 (feat: integration of lookupAuthMemberFollowed complex query business logic)
 
 @Injectable()
 export class FollowService {
@@ -34,7 +30,11 @@ export class FollowService {
 
 		const result = await this.registerSubscription(followerId, followingId);
 
-		await this.memberService.memberStatsEditor({ _id: followerId, targetKey: 'memberFollowings', modifier: 1 });
+		await this.memberService.memberStatsEditor({
+			_id: followerId,
+			targetKey: 'memberFollowings',
+			modifier: 1,
+		});
 		await this.memberService.memberStatsEditor({ _id: followingId, targetKey: 'memberFollowers', modifier: 1 });
 
 		return result;
@@ -84,14 +84,12 @@ export class FollowService {
 							{ $skip: (page - 1) * limit },
 							{ $limit: limit },
 							//meLiked
-<<<<<<< HEAD
-=======
 							lookupAuthMemberLiked(memberId, '$followingId'),
 							lookupAuthMemberFollowed({
 								followerId: memberId,
 								followingId: '$followingId',
 							}),
->>>>>>> 0d80e64 (feat: integration of lookupAuthMemberFollowed complex query business logic)
+							lookupAuthMemberLiked(memberId, '$followingId'),
 							//meFollowed
 							lookupFollowingData,
 							{ $unwind: '$followingData' },
@@ -106,7 +104,7 @@ export class FollowService {
 		return result[0];
 	}
 
-    public async getMemberFollowers(memberId: ObjectId, input: FollowInquiry): Promise<Followers> {
+	public async getMemberFollowers(memberId: ObjectId, input: FollowInquiry): Promise<Followers> {
 		const { page, limit, search } = input;
 		if (!search?.followingId) throw new InternalServerErrorException(Message.BAD_REQUEST);
 		const match: T = { followingId: search?.followingId };
@@ -122,10 +120,8 @@ export class FollowService {
 							{ $skip: (page - 1) * limit },
 							{ $limit: limit },
 							//meLiked
-<<<<<<< HEAD
-=======
 							lookupAuthMemberLiked(memberId, '$followerId'),
->>>>>>> 0d80e64 (feat: integration of lookupAuthMemberFollowed complex query business logic)
+							lookupAuthMemberLiked(memberId, '$followerId'),
 							//meFollowed
 							lookupAuthMemberFollowed({
 								followerId: memberId,
