@@ -2,7 +2,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FollowService } from './follow.service';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { Follower, Followings } from '../../libs/dto/follow/follow';
+import { Follower, Followers, Followings } from '../../libs/dto/follow/follow';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { ObjectId } from 'mongoose';
 import { shapeIntoMongoObjectId } from '../../libs/config';
@@ -42,11 +42,11 @@ export class FollowResolver {
 	}
 
     @UseGuards(WithoutGuard)
-	@Query((returns) => Followings)
+	@Query((returns) => Followers)
 	public async getMemberFollowers(
 		@Args('input') input: FollowInquiry,
 		@AuthMember('_id') memberId: ObjectId,
-	): Promise<Followings> {
+	): Promise<Followers> {
 		console.log('Query: getMemberFollowers');
 		const { followingId } = input.search;
 		input.search.followingId = shapeIntoMongoObjectId(followingId);
