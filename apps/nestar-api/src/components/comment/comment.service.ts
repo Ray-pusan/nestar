@@ -84,7 +84,7 @@ export class CommentService {
 		const match: T = { commentRefId: commentRefId, commentStatus: CommentStatus.ACTIVE };
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
 
-		const result = await this.commentModel
+		const result: Comments[] = await this.commentModel
 			.aggregate([
 				{ $match: match },
 				{ $sort: sort },
